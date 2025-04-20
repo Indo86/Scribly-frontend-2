@@ -1,2 +1,2 @@
 runtime: nodejs22
-service: standard
+service: scribly-frontend-2
