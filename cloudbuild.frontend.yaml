@@ -1,41 +1,45 @@
+# cloudbuild.frontend.yaml
+
 steps:
-  # Step 1: Install dependencies
+  # 1. Install dependencies
   - name: "gcr.io/cloud-builders/npm"
     entrypoint: bash
     args:
       - -c
       - |
-        if [ ! -d "node_modules" ]; then
-          echo "Installing dependencies..."
-          npm ci
-        else
-          echo "Skipping npm install, node_modules exists."
-        fi
-    dir: "frontend"
+          if [ ! -d "node_modules" ]; then
+            echo "Installing dependencies..."
+            npm ci
+          else
+            echo "Skipping npm install, node_modules exists."
+          fi
     volumes:
-      - name: "npm-cache"
+      - name: npm-cache
         path: /root/.npm
 
-  # Step 2: Build frontend dengan injeksi VITE_API_URL
+  # 2. Build frontend (Vite → output ke dist/ atau build/)
   - name: "gcr.io/cloud-builders/npm"
     entrypoint: bash
     args:
       - -c
       - |
-        npm run build
-    dir: "frontend"
+          npm run build
     volumes:
-      - name: "npm-cache"
+      - name: npm-cache
         path: /root/.npm
 
-  # Step 3: Deploy ke App Engine
+  # 3. Deploy ke App Engine (gunakan app.yaml di root)
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    entrypoint: gcloud
+    entrypoint: "gcloud"
     args:
       [
-        "app", "deploy", "--quiet"
+        "app", "deploy", "app.yaml",
+        "--quiet"
       ]
-    dir: "frontend"
 
 options:
   logging: CLOUD_LOGGING_ONLY
+timeout: "1200s"
+volumes:
+  - name: npm-cache
+    path: /root/.npm
