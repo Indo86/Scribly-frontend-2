@@ -1,5 +1,4 @@
 # cloudbuild.frontend.yaml
-
 steps:
   # 1. Install dependencies
   - name: "gcr.io/cloud-builders/npm"
@@ -13,33 +12,20 @@ steps:
           else
             echo "Skipping npm install, node_modules exists."
           fi
-    volumes:
-      - name: npm-cache
-        path: /root/.npm
 
-  # 2. Build frontend (Vite → output ke dist/ atau build/)
+  # 2. Build frontend
   - name: "gcr.io/cloud-builders/npm"
     entrypoint: bash
     args:
       - -c
       - |
           npm run build
-    volumes:
-      - name: npm-cache
-        path: /root/.npm
 
-  # 3. Deploy ke App Engine (gunakan app.yaml di root)
+  # 3. Deploy ke App Engine
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: "gcloud"
-    args:
-      [
-        "app", "deploy", "app.yaml",
-        "--quiet"
-      ]
+    args: ["app", "deploy", "app.yaml", "--quiet"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
 timeout: "1200s"
-volumes:
-  - name: npm-cache
-    path: /root/.npm
