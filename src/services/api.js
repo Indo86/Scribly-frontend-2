@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5001/api"; 
+const API_URL = "https://scribly-backend-2-559917148272.us-central1.run.app/api"; 
 
 const api = {
 
